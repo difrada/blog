@@ -1,0 +1,63 @@
+# =============================================================================
+# QUÉ HACE ESTE ARCHIVO (GitHub Actions explicado)
+# =============================================================================
+#
+# GitHub Actions es un sistema de automatización integrado en GitHub.
+# Este archivo le dice a GitHub: "cada vez que alguien haga push a la
+# rama main, ejecuta estos pasos automáticamente".
+#
+# En nuestro caso: builda el sitio, crea la imagen Docker, y la sube
+# a GitHub Container Registry (ghcr.io) para que puedan hacer pull
+# desde su servidor.
+#
+# Este archivo vive en .github/workflows/ y GitHub lo detecta automáticamente.
+# =============================================================================
+
+name: Build and Push Blog
+
+# ¿Cuándo se ejecuta? Cada vez que hay push a main (merge de un PR)
+on:
+  push:
+    branches: [main]
+
+# Permisos para poder subir imágenes al Container Registry de GitHub
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest  # Máquina virtual donde corre todo
+
+    steps:
+      # Paso 1: Descargar el código del repo
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      # Paso 2: Iniciar sesión en GitHub Container Registry
+      # GITHUB_TOKEN se genera automáticamente, no necesitas configurar nada
+      - name: Login en GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Paso 3: Preparar metadatos para la imagen (tags, labels)
+      - name: Preparar metadatos de la imagen
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=sha
+            type=raw,value=latest
+
+      # Paso 4: Buildar la imagen Docker y subirla al registry
+      - name: Build y Push de imagen Docker
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

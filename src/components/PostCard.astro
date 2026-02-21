@@ -1,0 +1,35 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  pubDate: Date;
+  author: string;
+  slug: string;
+  tags?: string[];
+}
+
+const { title, description, pubDate, author, slug, tags = [] } = Astro.props;
+
+const formattedDate = pubDate.toLocaleDateString('es-ES', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<article class="post-card">
+  <h2 class="post-card__title">
+    <a href={`/posts/${slug}/`}>{title}</a>
+  </h2>
+  <p class="post-card__meta">
+    <time datetime={pubDate.toISOString()}>{formattedDate}</time> · {author}
+  </p>
+  <p class="post-card__description">{description}</p>
+  {tags.length > 0 && (
+    <div class="post-card__tags">
+      {tags.map((tag) => (
+        <span class="tag">{tag}</span>
+      ))}
+    </div>
+  )}
+</article>

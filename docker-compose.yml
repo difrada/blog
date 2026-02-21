@@ -1,0 +1,12 @@
+# Para correr localmente o en el servidor
+# docker compose up -d
+
+services:
+  blog:
+    # En desarrollo, builda desde el Dockerfile local:
+    build: .
+    # En producción, comenta 'build' y descomenta 'image':
+    # image: ghcr.io/TU-USUARIO/TU-REPO:latest
+    ports:
+      - "80:80"
+    restart: unless-stopped
