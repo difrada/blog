@@ -1,5 +1,7 @@
 ---
 import '../styles/global.css';
+import { SITE } from '../site.config';
+import { t, type Lang } from '../i18n/translations';
 
 interface Props {
   title: string;
@@ -8,6 +10,7 @@ interface Props {
   article?: boolean;
   pubDate?: Date;
   author?: string;
+  lang?: Lang;
 }
 
 const {
@@ -17,33 +20,33 @@ const {
   article = false,
   pubDate,
   author,
+  lang = SITE.defaultLang,
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const ogImageURL = new URL(image, Astro.site);
-const siteName = 'Nuestro Blog'; // Cambiar por el nombre de su blog
 ---
 
 <!DOCTYPE html>
-<html lang="es">
+<html lang={lang} data-theme={SITE.defaultTheme}>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="generator" content={Astro.generator} />
 
-  <!-- SEO Básico -->
-  <title>{title} | {siteName}</title>
+  <!-- SEO -->
+  <title>{title} | {SITE.name}</title>
   <meta name="description" content={description} />
   <link rel="canonical" href={canonicalURL} />
 
-  <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
+  <!-- Open Graph -->
   <meta property="og:type" content={article ? 'article' : 'website'} />
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:image" content={ogImageURL} />
   <meta property="og:url" content={canonicalURL} />
-  <meta property="og:site_name" content={siteName} />
-  <meta property="og:locale" content="es_ES" />
+  <meta property="og:site_name" content={SITE.name} />
+  <meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_US'} />
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
@@ -51,7 +54,6 @@ const siteName = 'Nuestro Blog'; // Cambiar por el nombre de su blog
   <meta name="twitter:description" content={description} />
   <meta name="twitter:image" content={ogImageURL} />
 
-  <!-- Article specific -->
   {article && pubDate && (
     <meta property="article:published_time" content={pubDate.toISOString()} />
   )}
@@ -60,25 +62,52 @@ const siteName = 'Nuestro Blog'; // Cambiar por el nombre de su blog
   )}
 
   <!-- RSS -->
-  <link rel="alternate" type="application/rss+xml" title={siteName} href="/rss.xml" />
+  <link rel="alternate" type="application/rss+xml" title={SITE.name} href="/rss.xml" />
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-  <!-- Fuentes -->
+  <!-- Fonts: Poiret One (Art Deco headings) + Inter (body) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poiret+One&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Theme: restore saved preference before render to prevent flash -->
+  <script is:inline>
+    (function() {
+      const saved = localStorage.getItem('theme');
+      if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+      }
+    })();
+  </script>
 </head>
 <body>
   <header class="site-header">
     <div class="container container--wide">
-      <a href="/" class="site-logo">{siteName}</a>
-      <nav class="site-nav">
-        <a href="/">Inicio</a>
-        <a href="/about">Nosotros</a>
-        <a href="/rss.xml" target="_blank">RSS</a>
-      </nav>
+      <a href="/" class="site-logo">{SITE.name}</a>
+
+      <div class="header-right">
+        <nav class="site-nav" id="nav">
+          <a href="/">{t(lang, 'nav.home')}</a>
+          <a href="/about">{t(lang, 'nav.about')}</a>
+          <a href="/rss.xml" target="_blank">{t(lang, 'nav.rss')}</a>
+        </nav>
+
+        <div class="toggle-group">
+          <!-- Theme toggle -->
+          <button class="toggle-btn" id="theme-toggle" aria-label="Toggle theme">
+            <svg id="icon-sun" viewBox="0 0 24 24" style="display:none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg id="icon-moon" viewBox="0 0 24 24" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+
+          <!-- Lang toggle -->
+          <button class="toggle-btn" id="lang-toggle" aria-label="Toggle language">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span id="lang-label"></span>
+          </button>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -88,11 +117,11 @@ const siteName = 'Nuestro Blog'; // Cambiar por el nombre de su blog
 
   <footer class="site-footer">
     <div class="container">
-      <p>&copy; {new Date().getFullYear()} {siteName}. Todos los derechos reservados.</p>
+      <p>&copy; {new Date().getFullYear()} {SITE.name}. <span class="footer-rights">{t(lang, 'footer.rights')}</span></p>
     </div>
   </footer>
 
-  <!-- JSON-LD Schema para SEO -->
+  <!-- JSON-LD Schema -->
   {article ? (
     <script type="application/ld+json" set:html={JSON.stringify({
       "@context": "https://schema.org",
@@ -101,26 +130,121 @@ const siteName = 'Nuestro Blog'; // Cambiar por el nombre de su blog
       "description": description,
       "image": ogImageURL.toString(),
       "datePublished": pubDate?.toISOString(),
-      "author": {
-        "@type": "Person",
-        "name": author,
-      },
-      "publisher": {
-        "@type": "Organization",
-        "name": siteName,
-      },
-      "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": canonicalURL.toString(),
-      },
+      "author": { "@type": "Person", "name": author },
+      "publisher": { "@type": "Organization", "name": SITE.name },
+      "mainEntityOfPage": { "@type": "WebPage", "@id": canonicalURL.toString() },
     })} />
   ) : (
     <script type="application/ld+json" set:html={JSON.stringify({
       "@context": "https://schema.org",
       "@type": "WebSite",
-      "name": siteName,
+      "name": SITE.name,
       "url": Astro.site?.toString(),
     })} />
   )}
+
+  <!-- Client-side: theme + lang toggles -->
+  <script is:inline>
+    (function() {
+      // --- Theme ---
+      const themeBtn = document.getElementById('theme-toggle');
+      const iconSun = document.getElementById('icon-sun');
+      const iconMoon = document.getElementById('icon-moon');
+
+      function updateThemeIcons() {
+        const current = document.documentElement.getAttribute('data-theme');
+        if (current === 'dark') {
+          iconSun.style.display = 'block';
+          iconMoon.style.display = 'none';
+        } else {
+          iconSun.style.display = 'none';
+          iconMoon.style.display = 'block';
+        }
+      }
+      updateThemeIcons();
+
+      themeBtn.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        updateThemeIcons();
+      });
+
+      // --- Language ---
+      const langBtn = document.getElementById('lang-toggle');
+      const langLabel = document.getElementById('lang-label');
+      const savedLang = localStorage.getItem('lang') || 'en';
+
+      function updateLangLabel() {
+        const current = localStorage.getItem('lang') || 'en';
+        langLabel.textContent = current === 'en' ? 'ES' : 'EN';
+      }
+      updateLangLabel();
+
+      langBtn.addEventListener('click', () => {
+        const current = localStorage.getItem('lang') || 'en';
+        const next = current === 'en' ? 'es' : 'en';
+        localStorage.setItem('lang', next);
+        // Reload to apply translations
+        window.location.reload();
+      });
+
+      // Apply saved lang on load (update nav, footer, home page, filters)
+      function applyLang() {
+        const lang = localStorage.getItem('lang') || 'en';
+        document.documentElement.setAttribute('lang', lang);
+
+        const translations = {
+          en: {
+            home: 'Home', about: 'About', rss: 'RSS',
+            rights: 'All rights reserved.',
+            search: 'Search articles or tags...',
+            homeTitle: 'Latest articles',
+            homeSubtitle: 'Ideas, learnings, and things we find interesting.',
+            noResults: 'No results found.',
+            empty: 'No articles published yet. Coming soon!',
+            filterAll: 'All',
+          },
+          es: {
+            home: 'Inicio', about: 'Nosotros', rss: 'RSS',
+            rights: 'Todos los derechos reservados.',
+            search: 'Buscar artículos o etiquetas...',
+            homeTitle: 'Últimos artículos',
+            homeSubtitle: 'Ideas, aprendizajes y cosas que nos parecen interesantes.',
+            noResults: 'No se encontraron resultados.',
+            empty: 'Aún no hay artículos publicados. ¡Pronto vendrán!',
+            filterAll: 'Todos',
+          },
+        };
+        const t = translations[lang] || translations.en;
+
+        const navLinks = document.querySelectorAll('#nav a');
+        if (navLinks[0]) navLinks[0].textContent = t.home;
+        if (navLinks[1]) navLinks[1].textContent = t.about;
+        if (navLinks[2]) navLinks[2].textContent = t.rss;
+
+        const rights = document.querySelector('.footer-rights');
+        if (rights) rights.textContent = t.rights;
+
+        const search = document.querySelector('.search-input');
+        if (search) search.placeholder = t.search;
+
+        const homeTitle = document.querySelector('.home-title');
+        if (homeTitle) homeTitle.textContent = t.homeTitle;
+        const homeSubtitle = document.querySelector('.home-subtitle');
+        if (homeSubtitle) homeSubtitle.textContent = t.homeSubtitle;
+
+        const noResults = document.getElementById('no-results');
+        if (noResults) noResults.textContent = t.noResults;
+        const emptyMsg = document.querySelector('.empty-msg');
+        if (emptyMsg) emptyMsg.textContent = t.empty;
+
+        const allPill = document.querySelector('.category-pill[data-filter="all"]');
+        if (allPill) allPill.textContent = t.filterAll;
+      }
+      applyLang();
+    })();
+  </script>
 </body>
 </html>

@@ -2,40 +2,117 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PostCard from '../components/PostCard.astro';
 import { getCollection } from 'astro:content';
+import { readingTime } from '../utils/reading-time';
+import { CATEGORIES } from '../site.config';
 
 const posts = (await getCollection('posts', ({ data }) => !data.draft))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const categoryEntries = Object.entries(CATEGORIES) as [string, typeof CATEGORIES[keyof typeof CATEGORIES]][];
 ---
 
 <BaseLayout
-  title="Inicio"
-  description="Nuestro blog sobre tecnología, desarrollo y más. Artículos escritos por nuestro equipo."
+  title="Home"
+  description="A blog by friends who started building together. Articles on development, technology, and ideas."
 >
   <section class="container" style="padding: 3rem 1.5rem;">
-    <h1 style="margin-bottom: 0.5rem;">Últimos artículos</h1>
-    <p style="color: var(--color-text-muted); margin-bottom: 2rem;">
-      Ideas, aprendizajes y cosas que nos parecen interesantes.
+    <h1 style="margin-bottom: 0.5rem;" class="home-title">Latest articles</h1>
+    <p style="color: var(--color-text-muted); margin-bottom: 2rem;" class="home-subtitle">
+      Ideas, learnings, and things we find interesting.
     </p>
 
-    <ul class="post-list">
-      {posts.map((post) => (
-        <li>
-          <PostCard
-            title={post.data.title}
-            description={post.data.description}
-            pubDate={post.data.pubDate}
-            author={post.data.author}
-            slug={post.id}
-            tags={post.data.tags}
-          />
-        </li>
+    <!-- Search -->
+    <div class="search-container">
+      <div class="search-wrapper">
+        <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="search-input" id="search" placeholder="Search articles or tags..." autocomplete="off" />
+      </div>
+    </div>
+
+    <!-- Category filters -->
+    <div class="category-filters">
+      <button class="category-pill active" data-filter="all">All</button>
+      {categoryEntries.map(([id, cat]) => (
+        <button class="category-pill" data-filter={id}>{cat.icon} {cat.en}</button>
       ))}
+    </div>
+
+    <ul class="post-list" id="post-list">
+      {posts.map(async (post) => {
+        const rt = readingTime(post.body || '');
+        return (
+          <li>
+            <PostCard
+              title={post.data.title}
+              description={post.data.description}
+              pubDate={post.data.pubDate}
+              author={post.data.author}
+              slug={post.id}
+              tags={post.data.tags}
+              category={post.data.category}
+              lang={post.data.lang}
+              readingTime={rt}
+            />
+          </li>
+        );
+      })}
     </ul>
 
+    <p id="no-results" style="color: var(--color-text-muted); text-align: center; padding: 3rem 0; display: none;">
+      No results found.
+    </p>
+
     {posts.length === 0 && (
-      <p style="color: var(--color-text-muted); text-align: center; padding: 4rem 0;">
-        Aún no hay artículos publicados. ¡Pronto vendrán!
+      <p style="color: var(--color-text-muted); text-align: center; padding: 4rem 0;" class="empty-msg">
+        No articles published yet. Coming soon!
       </p>
     )}
   </section>
+
+  <!-- Search + filter logic -->
+  <script is:inline>
+    (function() {
+      const searchInput = document.getElementById('search');
+      const postList = document.getElementById('post-list');
+      const noResults = document.getElementById('no-results');
+      const pills = document.querySelectorAll('.category-pill');
+      let activeCategory = 'all';
+
+      function filterPosts() {
+        const query = searchInput.value.toLowerCase().trim();
+        const items = postList.querySelectorAll('li');
+        let visible = 0;
+
+        items.forEach(li => {
+          const card = li.querySelector('.post-card');
+          const title = card.getAttribute('data-title') || '';
+          const tags = card.getAttribute('data-tags') || '';
+          const cat = card.getAttribute('data-category') || '';
+
+          const matchesSearch = !query || title.includes(query) || tags.includes(query);
+          const matchesCat = activeCategory === 'all' || cat === activeCategory;
+
+          if (matchesSearch && matchesCat) {
+            li.style.display = '';
+            visible++;
+          } else {
+            li.style.display = 'none';
+          }
+        });
+
+        noResults.style.display = visible === 0 && postList.children.length > 0 ? 'block' : 'none';
+      }
+
+      searchInput.addEventListener('input', filterPosts);
+
+      pills.forEach(pill => {
+        pill.addEventListener('click', () => {
+          pills.forEach(p => p.classList.remove('active'));
+          pill.classList.add('active');
+          activeCategory = pill.getAttribute('data-filter');
+          filterPosts();
+        });
+      });
+    })();
+  </script>
 </BaseLayout>

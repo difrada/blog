@@ -1,26 +1,50 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import SocialLinks from '../components/SocialLinks.astro';
+import { AUTHORS, SITE } from '../site.config';
 ---
 
 <BaseLayout
-  title="Nosotros"
-  description="Conoce al equipo detrás del blog."
+  title="About"
+  description="Meet the team behind Radianco."
 >
   <section class="container" style="padding: 3rem 1.5rem;">
-    <h1>Sobre nosotros</h1>
-    <p style="margin-top: 1rem; color: var(--color-text-muted); font-size: 1.1rem;">
-      Somos un grupo de amigos apasionados por la tecnología y el desarrollo.
-      Usamos este blog para compartir lo que aprendemos, lo que construimos,
-      y lo que nos parece interesante.
+    <h1>About</h1>
+
+    <p style="margin-top: 1rem; color: var(--color-text-muted); font-size: 1.1rem; line-height: 1.8;">
+      We are a group of friends who started developing together. What began as side projects and
+      late-night coding sessions turned into a shared passion for building, learning, and writing
+      about it. This blog is our space to share ideas, document what we learn, and hopefully
+      help others along the way.
     </p>
 
-    <h2>¿Quieres contribuir?</h2>
-    <p>
-      Este blog es open source. Si quieres publicar un artículo, abre un
-      <a href="https://github.com/TU-USUARIO/TU-REPO" target="_blank" rel="noopener">
-        Pull Request en nuestro repositorio
+    <h2 style="margin-top: 2.5rem;">The team</h2>
+
+    <div class="about-authors">
+      {AUTHORS.map((author) => {
+        const initials = author.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+        return (
+          <div class="about-author-card">
+            {author.avatar ? (
+              <img src={author.avatar} alt={author.name} class="author-avatar" style="width: 80px; height: 80px;" />
+            ) : (
+              <div class="author-avatar-placeholder">{initials}</div>
+            )}
+            <h3 style="margin-top: 0;"><a href={`/authors/${author.id}/`}>{author.name}</a></h3>
+            <p style="color: var(--color-text-muted); font-size: 0.9rem; margin-top: 0.25rem;">{author.shortBio.en}</p>
+            <SocialLinks socials={author.socials} />
+          </div>
+        );
+      })}
+    </div>
+
+    <h2 style="margin-top: 2.5rem;">Want to contribute?</h2>
+    <p style="margin-top: 0.5rem;">
+      This blog is open source. If you want to publish an article, open a
+      <a href="https://github.com/difrada/blog" target="_blank" rel="noopener">
+        Pull Request on our repository
       </a>
-      con tu post en Markdown y lo revisaremos.
+      with your post in Markdown and we'll review it.
     </p>
   </section>
 </BaseLayout>

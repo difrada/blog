@@ -1,6 +1,8 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection, render } from 'astro:content';
+import { readingTime } from '../../utils/reading-time';
+import { getAuthor, CATEGORIES } from '../../site.config';
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts', ({ data }) => !data.draft);
@@ -12,8 +14,11 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content } = await render(post);
+const rt = readingTime(post.body || '');
+const authorData = getAuthor(post.data.author);
+const catData = CATEGORIES[post.data.category];
 
-const formattedDate = post.data.pubDate.toLocaleDateString('es-ES', {
+const formattedDate = post.data.pubDate.toLocaleDateString('en-US', {
   year: 'numeric',
   month: 'long',
   day: 'numeric',
@@ -26,21 +31,37 @@ const formattedDate = post.data.pubDate.toLocaleDateString('es-ES', {
   image={post.data.image}
   article={true}
   pubDate={post.data.pubDate}
-  author={post.data.author}
+  author={authorData?.name || post.data.author}
+  lang={post.data.lang}
 >
   <article class="container" style="padding: 3rem 1.5rem;">
     <div class="article-header">
       <h1>{post.data.title}</h1>
       <p class="post-card__meta">
-        <time datetime={post.data.pubDate.toISOString()}>{formattedDate}</time> · {post.data.author}
+        <!-- Calendar icon -->
+        <svg class="meta-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <em>{formattedDate}</em>
+        <span class="meta-separator">·</span>
+        <!-- Clock icon -->
+        <svg class="meta-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <em>{rt} min read</em>
+        <span class="meta-separator">·</span>
+        <!-- Person icon -->
+        <svg class="meta-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        {authorData ? (
+          <a href={`/authors/${authorData.id}/`} class="author-link">{authorData.name}</a>
+        ) : (
+          <span>{post.data.author}</span>
+        )}
       </p>
-      {post.data.tags.length > 0 && (
-        <div class="post-card__tags" style="margin-top: 0.75rem;">
-          {post.data.tags.map((tag: string) => (
-            <span class="tag">{tag}</span>
-          ))}
-        </div>
-      )}
+
+      <div class="post-card__footer" style="margin-top: 0.75rem;">
+        <span class="category-badge">{catData?.icon} {catData?.en || post.data.category}</span>
+        <span class="lang-badge">{post.data.lang.toUpperCase()}</span>
+        {post.data.tags.map((tag: string) => (
+          <span class="tag">{tag}</span>
+        ))}
+      </div>
     </div>
 
     <div class="article-content">

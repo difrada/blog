@@ -1,0 +1,69 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import SocialLinks from '../../components/SocialLinks.astro';
+import { getCollection } from 'astro:content';
+import { AUTHORS } from '../../site.config';
+import { readingTime } from '../../utils/reading-time';
+
+export function getStaticPaths() {
+  return AUTHORS.map((author) => ({
+    params: { id: author.id },
+    props: { author },
+  }));
+}
+
+const { author } = Astro.props;
+
+const posts = (await getCollection('posts', ({ data }) => !data.draft && data.author === author.id))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const initials = author.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+---
+
+<BaseLayout
+  title={author.name}
+  description={author.bio.en}
+>
+  <section class="container" style="padding: 3rem 1.5rem;">
+    <div class="author-profile">
+      {author.avatar ? (
+        <img src={author.avatar} alt={author.name} class="author-avatar" />
+      ) : (
+        <div class="author-avatar-placeholder">{initials}</div>
+      )}
+      <div class="author-info">
+        <h1>{author.name}</h1>
+        <p class="author-bio">{author.bio.en}</p>
+        <SocialLinks socials={author.socials} />
+      </div>
+    </div>
+
+    <h2>Articles by {author.name}</h2>
+
+    {posts.length > 0 ? (
+      <ul class="post-list" style="margin-top: 1rem;">
+        {posts.map(async (post) => {
+          const rt = readingTime(post.body || '');
+          return (
+            <li>
+              <PostCard
+                title={post.data.title}
+                description={post.data.description}
+                pubDate={post.data.pubDate}
+                author={post.data.author}
+                slug={post.id}
+                tags={post.data.tags}
+                category={post.data.category}
+                lang={post.data.lang}
+                readingTime={rt}
+              />
+            </li>
+          );
+        })}
+      </ul>
+    ) : (
+      <p style="color: var(--color-text-muted); margin-top: 1rem;">No articles yet.</p>
+    )}
+  </section>
+</BaseLayout>

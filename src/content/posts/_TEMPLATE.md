@@ -1,34 +1,36 @@
 ---
-title: "Título de tu artículo"
-description: "Una descripción corta (1-2 oraciones). Esto aparece en el listado y en los meta tags de SEO."
-author: "Tu Nombre"
+title: "Your article title"
+description: "A short description (1-2 sentences). This appears in the listing and SEO meta tags."
+author: "sebastian-franco"  # Must match an author id from site.config.ts
 pubDate: 2026-01-01
 tags: ["tag1", "tag2"]
-image: "/images/mi-imagen.png"   # Opcional
-imageAlt: "Descripción de la imagen" # Opcional
-draft: true  # Cambiar a false cuando esté listo
+category: "dev"             # Options: dev, nocode, reads
+lang: "en"                  # Options: en, es
+image: "/images/my-image.png"   # Optional
+imageAlt: "Image description"   # Optional
+draft: true                 # Change to false when ready
 ---
 
-## Introducción
+## Introduction
 
-Escribe tu contenido aquí usando Markdown normal.
+Write your content here using regular Markdown.
 
-## Código
+## Code
 
-Puedes incluir bloques de código:
+You can include code blocks:
 
 ```javascript
-console.log('Hola mundo');
+console.log('Hello world');
 ```
 
-## Imágenes
+## Images
 
-Si necesitas imágenes, colócalas en `public/images/` y referencialas así:
+Place images in `public/images/` and reference them:
 
-![Descripción de la imagen](/images/mi-imagen.png)
+![Image description](/images/my-image.png)
 
 ## Links
 
-[Texto del link](https://ejemplo.com)
+Use [hyperlinks](https://example.com) to reference definitions, related articles, or external resources.
 
-> También puedes usar blockquotes para citas o notas importantes.
+> You can also use blockquotes for important notes.
