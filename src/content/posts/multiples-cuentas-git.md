@@ -2,7 +2,7 @@
 title: "On building things with friends"
 description: "A reflection on what it means to create something together, why side projects matter, and how a blog became more than just code."
 author: "francisco-diago"
-pubDate: 2026-02-18
+pubDate: 2026-02-27
 tags: ["vscode", "git", "repository"]
 category: "reads"
 lang: "es"
