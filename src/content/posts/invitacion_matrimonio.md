@@ -1,6 +1,6 @@
 ---
 title: "Cómo diseñé la página web y las invitaciones de mi boda usando IA"
-description: "A reflection on what it means to create something together, why side projects matter, and how a blog became more than just code."
+description: "Creando con Gemini Pro 3.1 una web y pdf con las informacion e invitaciones a mi matrimonio"
 author: "francisco-diago"
 pubDate: 2026-02-27
 tags: ["wedding", "web", "html", "css", "javascript", "blog"]

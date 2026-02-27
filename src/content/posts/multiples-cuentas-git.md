@@ -1,6 +1,6 @@
 ---
-title: "On building things with friends"
-description: "A reflection on what it means to create something together, why side projects matter, and how a blog became more than just code."
+title: "Cómo Usar Múltiples Cuentas de Git en VSCode (Sin Volverte Loco)"
+description: "Si eres desarrollador, es muy probable que te hayas enfrentado a este problema: tienes tu cuenta de GitHub **Personal** para tus proyectos propios, y otra cuenta corporativa para tu empresa"
 author: "francisco-diago"
 pubDate: 2026-02-27
 tags: ["vscode", "git", "repository"]
@@ -11,7 +11,7 @@ draft: false
 
 # Guía Definitiva: Cómo Usar Múltiples Cuentas de Git en VSCode (Sin Volverte Loco)
 
-Si eres desarrollador, es muy probable que te hayas enfrentado a este problema: tienes tu cuenta de GitHub **Personal** para tus proyectos propios, y otra cuenta corporativa para tu empresa (llamémosla **Radianco**). 
+    Si eres desarrollador, es muy probable que te hayas enfrentado a este problema: tienes tu cuenta de GitHub **Personal** para tus proyectos propios, y otra cuenta corporativa para tu empresa (llamémosla **Radianco**). 
 
 Terminar haciendo un commit en el repositorio de la empresa con tu correo personal es un error clásico. 
 
