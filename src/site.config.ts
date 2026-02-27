@@ -125,10 +125,10 @@ export const AUTHORS: Author[] = [
       en: 'Curious mind with a passion for technology and design.',
       es: 'Mente curiosa con pasión por la tecnología y el diseño.',
     },
-    avatar: '',
+    avatar: '/avatars/francisco-diago.jpg',
     socials: {
-      github: 'https://github.com/',
-      linkedin: 'https://linkedin.com/in/',
+      github: 'https://github.com/fdiago',
+      linkedin: 'https://www.linkedin.com/in/francisco-diago/',
       twitter: '',
       instagram: '',
       website: '',
